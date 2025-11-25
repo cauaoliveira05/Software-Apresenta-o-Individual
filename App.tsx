@@ -12,6 +12,7 @@ import { FEATURES } from './constants';
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [selectedFeatures, setSelectedFeatures] = useState<Set<string>>(new Set());
+  const [customRequirements, setCustomRequirements] = useState<string>('');
   const [recommendations, setRecommendations] = useState<ManagementSystem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +48,7 @@ const App: React.FC = () => {
         .filter(f => selectedFeatures.has(f.id))
         .map(f => f.name);
 
-      const result = await generateRecommendations(featureNames);
+      const result = await generateRecommendations(featureNames, customRequirements);
       setRecommendations(result);
     } catch (e) {
       console.error(e);
@@ -55,7 +56,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedFeatures]);
+  }, [selectedFeatures, customRequirements]);
 
   if (!isLoggedIn) {
     return <Login onLogin={handleLogin} />;
@@ -73,6 +74,24 @@ const App: React.FC = () => {
         </div>
 
         <FeatureSelector selectedFeatures={selectedFeatures} onToggle={handleFeatureToggle} />
+
+        <div className="max-w-3xl mx-auto mt-8">
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+             <label htmlFor="custom-requirements" className="block text-cyan-400 font-semibold mb-3 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Detalhes Adicionais (Opcional)
+             </label>
+             <textarea
+                id="custom-requirements"
+                value={customRequirements}
+                onChange={(e) => setCustomRequirements(e.target.value)}
+                placeholder="Ex: Preciso de uma ferramenta que tenha plano gratuito, suporte a português brasileiro e integração nativa com o Slack..."
+                className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-gray-200 placeholder-gray-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none transition-all duration-300 resize-none h-24"
+             />
+          </div>
+        </div>
 
         <div className="text-center mt-10">
           <button

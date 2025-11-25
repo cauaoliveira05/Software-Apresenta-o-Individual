@@ -46,12 +46,17 @@ const responseSchema = {
   };
 
 
-export const generateRecommendations = async (features: string[]): Promise<ManagementSystem[]> => {
+export const generateRecommendations = async (features: string[], customRequirements?: string): Promise<ManagementSystem[]> => {
+  const featuresList = features.join('\n- ');
+  const customReqText = customRequirements && customRequirements.trim() 
+    ? `\n\nAlém disso, o usuário especificou os seguintes requisitos ou preferências:\n"${customRequirements}"\n\nLeve isso em consideração ao escolher os sistemas e descrever seus benefícios.` 
+    : '';
+
   const prompt = `
 Com base nas seguintes funcionalidades necessárias, por favor, recomende 5 sistemas de gerenciamento populares e eficazes para freelancers. Para cada sistema, forneça o nome, uma breve descrição (2-3 frases), o URL do site oficial e uma lista de suas principais funcionalidades que correspondem à seleção do usuário.
 
 Funcionalidades Necessárias:
-- ${features.join('\n- ')}
+- ${featuresList}${customReqText}
 
 Por favor, forneça a saída no formato JSON especificado. Não inclua nenhum texto introdutório ou explicações fora da estrutura JSON. Garanta que o URL do site seja um link válido e direto para a página inicial da ferramenta.
   `;
